@@ -28,7 +28,7 @@ class EditEmpPage extends StatelessWidget {
   static GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   UDCController udcController;
   DrawMenuController drawMenuController;
-//check for gits
+
   bool validateAndSave() {
     if (globalFormKey.currentState.validate()) {
       globalFormKey.currentState.save();
