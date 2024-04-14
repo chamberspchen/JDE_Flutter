@@ -6,12 +6,12 @@ void main() {
 }
 
 class Todo {
-  String task;
-  RxBool completed;
+  String? task;
+  RxBool? completed;
 
   Todo({
     this.task,
-    bool completed,
+    required bool completed,
   }) : completed = completed.obs;
 }
 
@@ -20,14 +20,16 @@ class TodoController extends GetxController {
 
   void addTodo(String task) {
     todos.add(Todo(task: task, completed: false));
+    update();
   }
 
   void toggleTodo(int index) {
-    todos[index].completed.toggle();
+    todos[index].completed?.toggle();
   }
 
   void removeTodo(int index) {
     todos.removeAt(index);
+    update();
   }
 }
 
@@ -56,20 +58,20 @@ class MyApp extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Obx(
-                () => ListView.builder(
+              child: GetBuilder<TodoController>(builder: (_) {
+                return ListView.builder(
                   itemCount: todoController.todos.length,
                   itemBuilder: (context, index) {
                     final todo = todoController.todos[index];
 
                     return ListTile(
-                      title: Text(todo.task),
-                      leading: Obx(() => Checkbox(
-                            value: todo.completed.value,
-                            onChanged: (value) {
-                              todoController.toggleTodo(index);
-                            },
-                          )),
+                      title: Text(todo.task!),
+                      leading: Checkbox(
+                        value: todo.completed!.value,
+                        onChanged: (value) {
+                          todoController.toggleTodo(index);
+                        },
+                      ),
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
@@ -78,8 +80,8 @@ class MyApp extends StatelessWidget {
                       ),
                     );
                   },
-                ),
-              ),
+                );
+              }),
             ),
           ],
         ),
