@@ -15,15 +15,9 @@ class _LoginPageState extends State<LoginPage> {
   bool hidePassword = true;
   bool isApiCallProcess = false;
   GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
-  LoginRequestModel loginRequestModel;
+  LoginRequestModel loginRequestModel = new LoginRequestModel();
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
   get flatButtonStyle => null;
-  @override
-  void initState() {
-    super.initState();
-    loginRequestModel = new LoginRequestModel();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _uiSetup(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: Theme.of(context).colorScheme.secondary,
+      backgroundColor: Colors.blueAccent,
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -64,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(height: 25),
                         Text(
                           "E1 9.2 Login",
-                          style: Theme.of(context).textTheme.headline2,
+                          style: Theme.of(context).textTheme.displayMedium,
                         ),
                         SizedBox(height: 20),
                         new TextFormField(
@@ -74,20 +68,23 @@ class _LoginPageState extends State<LoginPage> {
                           keyboardType: TextInputType.name,
                           onSaved: (input) => loginRequestModel.user = input,
                           validator: (input) =>
-                              input.isEmpty ? "User Id should be valid" : null,
+                              input!.isEmpty ? "User Id should be valid" : null,
                           decoration: new InputDecoration(
                             hintText: "User ID",
                             enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
-                                        .accentColor
+                                        .colorScheme
+                                        .primary
                                         .withOpacity(0.2))),
                             focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: Theme.of(context).accentColor)),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary)),
                             prefixIcon: Icon(
                               Icons.chat,
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         ),
@@ -101,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                           onSaved: (input) =>
                               loginRequestModel.password = input,
                           //elve.holt@reqres.in
-                          validator: (input) => input.isEmpty
+                          validator: (input) => input!.isEmpty
                               ? "Password should not be blank"
                               : null,
                           obscureText: hidePassword,
@@ -110,14 +107,16 @@ class _LoginPageState extends State<LoginPage> {
                             enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
-                                        .accentColor
+                                        .colorScheme
+                                        .primary
                                         .withOpacity(0.2))),
                             focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: Theme.of(context).accentColor)),
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
                             prefixIcon: Icon(
                               Icons.lock,
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             suffixIcon: IconButton(
                               onPressed: () {
@@ -126,7 +125,8 @@ class _LoginPageState extends State<LoginPage> {
                                 });
                               },
                               color: Theme.of(context)
-                                  .accentColor
+                                  .colorScheme
+                                  .primary
                                   .withOpacity(0.4),
                               icon: Icon(hidePassword
                                   ? Icons.visibility_off
@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                           keyboardType: TextInputType.text,
                           onSaved: (input) => loginRequestModel.env = input,
                           //elve.holt@reqres.in
-                          validator: (input) => input.isEmpty
+                          validator: (input) => input!.isEmpty
                               ? "Environment should not be blank"
                               : null,
 
@@ -152,14 +152,16 @@ class _LoginPageState extends State<LoginPage> {
                             enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
-                                        .accentColor
+                                        .colorScheme
+                                        .primary
                                         .withOpacity(0.2))),
                             focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: Theme.of(context).accentColor)),
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
                             prefixIcon: Icon(
                               Icons.library_books,
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
@@ -169,21 +171,24 @@ class _LoginPageState extends State<LoginPage> {
                           textAlign: TextAlign.left,
                           keyboardType: TextInputType.text,
                           onSaved: (input) => loginRequestModel.role = input,
-                          validator: (input) =>
-                              input.isEmpty ? "Role should not be blank" : null,
+                          validator: (input) => input!.isEmpty
+                              ? "Role should not be blank"
+                              : null,
                           decoration: new InputDecoration(
                             hintText: "Role",
                             enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     color: Theme.of(context)
-                                        .accentColor
+                                        .colorScheme
+                                        .primary
                                         .withOpacity(0.2))),
                             focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: Theme.of(context).accentColor)),
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
                             prefixIcon: Icon(
                               Icons.man,
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
@@ -201,42 +206,32 @@ class _LoginPageState extends State<LoginPage> {
 
                               APIService apiService = new APIService();
                               apiService.login(loginRequestModel).then((value) {
-                                if (value != null) {
-                                  setState(() {
-                                    isApiCallProcess = false;
-                                  });
+                                setState(() {
+                                  isApiCallProcess = false;
+                                });
 
-                                  if (value.token.isNotEmpty) {
-                                    final snackBar = SnackBar(
-                                        content: Text("Login Successful"));
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                    //           scaffoldKey.currentState
-                                    //               .showSnackBar(snackBar);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            settings: RouteSettings(
-                                                name: "/ShowEMPPage"),
-                                            builder: (context) {
-                                              return ShowEmpPage(value.token);
-                                            }));
-                                  } else {
-                                    final snackBar =
-                                        SnackBar(content: Text(value.error));
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                    //          scaffoldKey.currentState
-                                    //              .showSnackBar(snackBar);
-                                  }
-                                } else {
-                                  final snackBar =
-                                      SnackBar(content: Text("Login Failure!"));
+                                if (value.token!.isNotEmpty) {
+                                  final snackBar = SnackBar(
+                                      content: Text("Login Successful"));
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(snackBar);
-                                  setState(() {
-                                    isApiCallProcess = false;
-                                  });
+                                  //           scaffoldKey.currentState
+                                  //               .showSnackBar(snackBar);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          settings: RouteSettings(
+                                              name: "/ShowEMPPage"),
+                                          builder: (context) {
+                                            return ShowEmpPage(value.token!);
+                                          }));
+                                } else {
+                                  final snackBar =
+                                      SnackBar(content: Text(value.error!));
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
+                                  //          scaffoldKey.currentState
+                                  //              .showSnackBar(snackBar);
                                 }
                               });
                             }
@@ -263,8 +258,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   bool validateAndSave() {
-    if (globalFormKey.currentState.validate()) {
-      globalFormKey.currentState.save();
+    if (globalFormKey.currentState != null &&
+        globalFormKey.currentState!.validate()) {
+      globalFormKey.currentState!.save();
       return true;
     }
     return false;

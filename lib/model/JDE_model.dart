@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
 //main Git
 class JDERequestModel {
   String token;
-  String key;
-  Employee employee;
+  String? key;
+  Employee? employee;
 
   JDERequestModel(
     this.token,
@@ -32,23 +31,38 @@ class JDERequestModel {
       body = jsonEncode({
         'token': token.trim(),
       });
+    } else if (request == 'asset') {
+      body = jsonEncode({
+        'token': token.trim(),
+        "assetID": "at1",
+        "eeID": "ep2",
+        "SeqID": "1",
+      });
     } else if (request == 'company') {
       body = jsonEncode({
         'token': token.trim(),
-        'companyID': key.trim(),
+        'companyID': key?.trim(),
       });
     } else if (request == 'delete') {
       body = jsonEncode({
         'token': token.trim(),
-        'empID': key.trim(),
+        'empID': key?.trim(),
       });
     } else if (request == 'update') {
       body = jsonEncode({
         'token': token.trim(),
-        'EmpID': employee.employeeID,
-        'EmpName': employee.employeeName,
-        'JobTitle': employee.jobDesc,
-        'ComID': employee.companyID
+        'EmpID': employee?.employeeID,
+        'EmpName': employee?.employeeName,
+        'JobTitle': employee?.jobDesc,
+        'ComID': employee?.companyID
+      });
+    } else if (request == 'Create') {
+      body = jsonEncode({
+        'token': token.trim(),
+        'EmployeeID': employee?.employeeID,
+        'EmployeeName': employee?.employeeName,
+        'JobTitle': employee?.jobDesc,
+        'CompanyID': employee?.companyID
       });
     }
 
@@ -59,21 +73,19 @@ class JDERequestModel {
 /***Return Response***/
 class CompanyResponseModel {
   List<Company> companylist = [];
-  String companyName;
-  CompanyResponseModel({this.companylist});
+  String? companyName;
+  CompanyResponseModel({required this.companylist});
 
   factory CompanyResponseModel.fromJson(Map<String, dynamic> json) {
     List<Company> complist = [];
-    if (json != null) {
-      List jsonlist = json["Company"]["rowset"];
-      for (int i = 0; i < jsonlist.length; i++) {
-        complist.add(new Company(
-          jsonlist[i]["Company Name"],
-          jsonlist[i]["Country Name"],
-          jsonlist[i]["City Name"],
-          jsonlist[i]["Employee Name"],
-        ));
-      }
+    List jsonlist = json["Company"]["rowset"];
+    for (int i = 0; i < jsonlist.length; i++) {
+      complist.add(new Company(
+        jsonlist[i]["Company Name"],
+        jsonlist[i]["Country Name"],
+        jsonlist[i]["City Name"],
+        jsonlist[i]["Employee Name"],
+      ));
     }
 
     return CompanyResponseModel(
@@ -88,21 +100,19 @@ class CompanyResponseModel {
 
 class EmployeeResponseModel {
   List<Employee> employeelist = [];
-  String employeeName;
-  EmployeeResponseModel({this.employeelist});
+  String? employeeName;
+  EmployeeResponseModel({required this.employeelist});
 
   factory EmployeeResponseModel.fromJson(Map<String, dynamic> json) {
     List<Employee> complist = [];
-    if (json != null) {
-      List jsonlist = json["Employee"]["rowset"];
-      for (int i = 0; i < jsonlist.length; i++) {
-        complist.add(new Employee(
-          jsonlist[i]["Company ID"],
-          jsonlist[i]["Employee ID"],
-          jsonlist[i]["Job Desc"],
-          jsonlist[i]["Employee Name"],
-        ));
-      }
+    List jsonlist = json["Employee"]["rowset"];
+    for (int i = 0; i < jsonlist.length; i++) {
+      complist.add(new Employee(
+        jsonlist[i]["Company ID"],
+        jsonlist[i]["Employee ID"],
+        jsonlist[i]["Job Desc"],
+        jsonlist[i]["Employee Name"],
+      ));
     }
 
     return EmployeeResponseModel(
@@ -121,16 +131,16 @@ class Company {
   String countryName;
   String cityName;
   String employeeName;
-  String error;
+  String? error;
 
   Company(this.companyName, this.countryName, this.cityName, this.employeeName);
 }
 
 class Employee {
-  String companyID;
-  String jobDesc;
-  String employeeName;
-  String employeeID;
+  String? companyID;
+  String? jobDesc;
+  String? employeeName;
+  String? employeeID;
 
   Employee(this.companyID, this.employeeID, this.jobDesc, this.employeeName);
   Employee.initValues();
@@ -150,6 +160,25 @@ class EmployeeModel extends ChangeNotifier {
     _employees[index].jobDesc = jodDesc;
     _employees[index].employeeName = employeeName;
     _employees[index].companyID = companyID;
+    notifyListeners();
+  }
+
+  void deleteEmployee(int index) {
+    _employees.removeAt(index);
+
+    notifyListeners();
+  }
+
+  void createEmployee(String jodDesc, String employeeName, String companyID,
+      String employeeID) {
+    Employee employee = new Employee.initValues();
+    employee.employeeID = companyID;
+    employee.jobDesc = jodDesc;
+    employee.employeeName = employeeName;
+    employee..companyID = companyID;
+
+    _employees.add(employee);
+
     notifyListeners();
   }
 }

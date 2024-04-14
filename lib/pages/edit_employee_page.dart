@@ -9,29 +9,26 @@ import 'package:get/get.dart';
 
 //bool isApiCallProcess = false;
 
+// ignore: must_be_immutable
 class EditEmpPage extends StatelessWidget {
   String token;
-  int index;
-  EditEmpPage(this.token);
+  int index = 0;
+  JDERequestModel? requestMD;
+  String? dropdownValue;
+  EmployeeModel? employeeModel;
+  Employee employee = new Employee.initValues();
+  String mode = "update";
 
+  APIService apiService = new APIService();
+  static GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
+
+  EditEmpPage(this.token);
   EditEmpPage.withIndex(this.token, this.index);
 
-//  String token;
-  APIService apiService = new APIService();
-
-  JDERequestModel requestMD;
-  String dropdownValue;
-  Employee employee = new Employee.initValues();
-  // String companyName = null;
-
-  EmployeeModel employeeModel;
-  static GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
-  UDCController udcController;
-  DrawMenuController drawMenuController;
-
   bool validateAndSave() {
-    if (globalFormKey.currentState.validate()) {
-      globalFormKey.currentState.save();
+    if (globalFormKey.currentState != null &&
+        globalFormKey.currentState!.validate()) {
+      globalFormKey.currentState?.save();
       return true;
     }
     return false;
@@ -40,19 +37,24 @@ class EditEmpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     requestMD = new JDERequestModel(token);
-
-    employeeModel = Provider.of<EmployeeModel>(context, listen: false);
-    dropdownValue = employeeModel.employees[index].companyID;
+    try {
+      employeeModel = Provider.of<EmployeeModel>(context, listen: false);
+      dropdownValue = employeeModel?.employees[index].companyID;
+    } on Exception {
+      employeeModel = new EmployeeModel();
+      dropdownValue = 'c1';
+      mode = "create";
+    }
 
     //Controler initial
 
-    udcController = Get.put(UDCController(requestMD));
-    drawMenuController = Get.put(DrawMenuController());
-    udcController.loadCompanyName(dropdownValue, context);
+    UDCController udcController = Get.put(UDCController(requestMD!));
+    DrawMenuController drawMenuController = Get.put(DrawMenuController());
+    udcController.loadCompanyName(dropdownValue!, context);
 
     return new MaterialApp(
         home: new Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Color.fromARGB(255, 154, 190, 253),
       appBar: new AppBar(
           title: new Text('Employee Detail Input'),
           leading: GestureDetector(
@@ -82,8 +84,9 @@ class EditEmpPage extends StatelessWidget {
                             12)), // Set border radius if you want rounded corners
                       ),
                       child: TextFormField(
-                          initialValue:
-                              employeeModel.employees[index].employeeName,
+                          initialValue: employeeModel!.employees.length != 0
+                              ? employeeModel!.employees[index].employeeName
+                              : '',
                           onSaved: (input) {
                             employee.employeeName = input;
                           },
@@ -115,8 +118,9 @@ class EditEmpPage extends StatelessWidget {
                                 12)), // Set border radius if you want rounded corners
                           ),
                           child: TextFormField(
-                            initialValue:
-                                employeeModel.employees[index].jobDesc,
+                            initialValue: employeeModel!.employees.length != 0
+                                ? employeeModel!.employees[index].jobDesc
+                                : '',
                             onSaved: (input) {
                               employee.jobDesc = input;
                             },
@@ -149,9 +153,12 @@ class EditEmpPage extends StatelessWidget {
                                 12)), // Set border radius if you want rounded corners
                           ),
                           child: TextFormField(
-                            enabled: false,
-                            initialValue:
-                                employeeModel.employees[index].employeeID,
+                            enabled: employeeModel!.employees.length != 0
+                                ? false
+                                : true,
+                            initialValue: employeeModel!.employees.length != 0
+                                ? employeeModel!.employees[index].employeeID
+                                : '',
                             onSaved: (input) {
                               employee.employeeID = input;
                             },
@@ -192,18 +199,19 @@ class EditEmpPage extends StatelessWidget {
                         borderRadius: BorderRadius.all(Radius.circular(
                             12)), // Set border radius if you want rounded corners
                       ),
+
                       padding: EdgeInsets.only(left: 20),
                       //     alignment: Alignment.topLeft,
 
                       //        crossAxisAlignment: CrossAxisAlignment.start,
                       child: GetBuilder<DrawMenuController>(
-                        builder: (drawMenuController) {
+                        builder: (_) {
                           return DropdownButton<String>(
                             value: dropdownValue,
                             icon: const Icon(Icons.arrow_drop_down_outlined),
                             elevation: 16,
-                            onChanged: (String value) {
-                              drawMenuController.refreshDropdown(value);
+                            onChanged: (String? value) {
+                              drawMenuController.refreshDropdown(value!);
                               udcController.loadCompanyName(value, context);
                               employee.companyID = value;
                               dropdownValue = value;
@@ -223,7 +231,7 @@ class EditEmpPage extends StatelessWidget {
                     SizedBox(
                       width: 40,
                     ),
-                    GetBuilder<UDCController>(builder: (udcController) {
+                    GetBuilder<UDCController>(builder: (_) {
                       return Text(
                         '${udcController.companyName.value}',
                         style: TextStyle(
@@ -241,7 +249,9 @@ class EditEmpPage extends StatelessWidget {
                   child: ElevatedButton(
                 onPressed: () {
                   if (validateAndSave()) {
-                    _updateEmployee(employee.employeeID, context);
+                    if (mode == "update")
+                      _updateEmployee(context);
+                    else if (mode == "create") _addEmployee(context);
                   }
                 },
                 child: Text('Confirm'),
@@ -252,13 +262,14 @@ class EditEmpPage extends StatelessWidget {
     ));
   }
 
-  _updateEmployee(String key, BuildContext context) {
+  _updateEmployee(BuildContext context) {
     runZoned(() {
-      requestMD.setEmployee = employee;
-      apiService.updateEmployee(requestMD).then((value) {
+      if (employee.companyID == null) employee.companyID = dropdownValue;
+      requestMD!.setEmployee = employee;
+      apiService.updateEmployee(requestMD!).then((value) {
         if (value) {
-          employeeModel.updateEmployee(
-              index, employee.jobDesc, employee.employeeName, dropdownValue);
+          employeeModel!.updateEmployee(
+              index, employee.jobDesc!, employee.employeeName!, dropdownValue!);
           Navigator.of(context).pop(ModalRoute.withName("/ShowEMPPage"));
         }
       });
@@ -266,6 +277,21 @@ class EditEmpPage extends StatelessWidget {
     }, onError: (dynamic e, StackTrace stack) {
       //  return false;
     });
+  }
+
+  _addEmployee(BuildContext context) {
+    runZoned(() {
+      if (employee.companyID == null) employee.companyID = dropdownValue;
+      requestMD!.setEmployee = employee;
+      apiService.createEmployee(requestMD!).then((value) {
+        if (value) {
+          employeeModel!.createEmployee(employee.employeeID!, employee.jobDesc!,
+              employee.employeeName!, dropdownValue!);
+          Navigator.of(context).pop(ModalRoute.withName("/ShowEMPPage"));
+        }
+      });
+      // ignore: deprecated_member_use
+    }, onError: (dynamic e, StackTrace stack) {});
   }
 }
 

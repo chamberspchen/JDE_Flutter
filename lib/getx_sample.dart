@@ -25,6 +25,7 @@ class TodoController extends GetxController {
 
   void toggleTodo(int index) {
     todos[index].completed?.toggle();
+    update();
   }
 
   void removeTodo(int index) {
@@ -34,10 +35,9 @@ class TodoController extends GetxController {
 }
 
 class MyApp extends StatelessWidget {
-  final TodoController todoController = Get.put(TodoController());
-
   @override
   Widget build(BuildContext context) {
+    TodoController todoController = Get.put(TodoController());
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(

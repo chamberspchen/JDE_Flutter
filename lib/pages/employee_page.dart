@@ -1,20 +1,20 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_http_post_request/pages/edit_employee_page.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 import '../model/JDE_model.dart';
 import '../api/api_service.dart';
-import '../ProgressHUD.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 enum MenuItem { delete, company }
 
+// ignore: must_be_immutable
 class ShowEmpPage extends StatefulWidget {
   String token;
   ShowEmpPage(this.token);
-
-//  const ShowEmpPage({super.key});
 
   @override
   State<ShowEmpPage> createState() => _ShowEmpPageState(token);
@@ -22,30 +22,25 @@ class ShowEmpPage extends StatefulWidget {
 
 class _ShowEmpPageState extends State<ShowEmpPage> {
   String token;
-
-  EmployeeModel employeeModel;
-
+  EmployeeModel employeeModel = new EmployeeModel();
   bool isApiCallProcess = true;
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  bool _Flag = true;
-  APIService apiService;
-  Map<int, String> empKey = {};
+  APIService apiService = new APIService();
 
   _ShowEmpPageState(this.token);
 
   @override
   void initState() {
-    employeeModel = new EmployeeModel();
     super.initState();
     runZoned(() {
       _loadEmployeeData();
+      // ignore: deprecated_member_use
     }, onError: (dynamic e, StackTrace stack) {
       Navigator.of(context).popUntil(ModalRoute.withName("/"));
     });
   }
 
   _loadEmployeeData() {
-    apiService = new APIService();
     apiService.getEmployee(new JDERequestModel(token)).then((value) {
       employeeModel.employees = value.getEmployeeData();
       if (employeeModel.employees.length != 0) {
@@ -59,11 +54,11 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<EmployeeModel>(
-        create: (context) => employeeModel,
+        create: (_) => employeeModel,
         child: MaterialApp(
             debugShowCheckedModeBanner: false,
             home: new Scaffold(
-              backgroundColor: Theme.of(context).colorScheme.background,
+              backgroundColor: const Color.fromARGB(255, 103, 158, 254),
               key: scaffoldKey,
               // backgroundColor: Theme.of(context).colorScheme.background,
               appBar: new AppBar(
@@ -115,19 +110,19 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
                 children: [
                   SlidableAction(
                     flex: 2,
-                    onPressed: (context) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              settings: RouteSettings(name: "/EMPPage"),
-                              builder: (context) {
-                                return EditEmpPage.withIndex(token, index);
-                              }));
+                    onPressed: (_) {
+                      runZoned(() {
+                        _deleteConfirm(context, index);
+                        // ignore: deprecated_member_use
+                      }, onError: (dynamic e, StackTrace stack) {
+                        Navigator.of(context)
+                            .popUntil(ModalRoute.withName("/"));
+                      });
                     },
                     backgroundColor: Color(0xFF7BC043),
                     foregroundColor: Color.fromARGB(255, 227, 21, 21),
                     icon: Icons.edit,
-                    label: 'Modify',
+                    label: 'Delete',
                   ),
                 ],
               ),
@@ -144,19 +139,13 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
                         title: Builder(builder: (context) {
                           employee = Provider.of<EmployeeModel>(context);
                           return RichText(
-                              text: TextSpan(
-                                  text: 'Employee:  ',
-                                  style: TextStyle(
-                                      //  fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      color: Color.fromARGB(255, 12, 13, 13)),
-                                  children: <TextSpan>[
-                                TextSpan(
-                                    text:
-                                        '${employee.employees[index].employeeName}',
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.blue)),
-                              ])
+                              text: TextSpan(children: <TextSpan>[
+                            TextSpan(
+                                text:
+                                    '${employee.employees[index].employeeName}',
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.blue)),
+                          ])
 
                               //${employeeList[index].employeeName}
                               );
@@ -171,9 +160,9 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
                           Builder(builder: (context) {
                             employee = Provider.of<EmployeeModel>(context);
                             return ListTile(
-                              tileColor: Color.fromARGB(255, 221, 237, 245),
+                              tileColor: Color.fromARGB(255, 242, 242, 231),
                               title: Text(
-                                'Job:    ${employeeModel.employees[index].jobDesc}',
+                                'Job:    ${employee.employees[index].jobDesc}',
                                 style: TextStyle(
                                     fontSize: 15,
                                     color: Color.fromARGB(255, 93, 33, 243)),
@@ -181,13 +170,10 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
                               //    trailing: Icon(Icons.more_vert)
                               trailing: _menu(
                                   context,
-                                  employeeModel.employees[index].employeeID,
+                                  employeeModel.employees[index].employeeID ??
+                                      '',
                                   index),
-                              onTap: () {
-                                var selectedItem =
-                                    employeeModel.employees[index];
-                                var selectedIndex = index;
-                              },
+                              onTap: () {},
                             );
                           }),
                         ],
@@ -207,32 +193,38 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
   }
 
   Widget _menu(BuildContext context, String empID, int index) {
-    empKey[index] = empID;
-
     return PopupMenuButton<String>(
+      color: Color.fromARGB(255, 250, 243, 247),
       itemBuilder: (context) => <PopupMenuEntry<String>>[
         const PopupMenuItem<String>(
-          value: 'Delete',
-          child: Text('Delete'),
+          value: 'Modify',
+          child: Text('Modify'),
         ),
+        const PopupMenuDivider(),
         const PopupMenuItem<String>(
           value: 'Assets',
-          child: Text('Fixed Assets'),
+          child: Text('Assets'),
         )
       ],
       onSelected: (String menuItem) {
-        if (menuItem == 'Company') {
-          scaffoldKey.currentState.showBottomSheet<void>(
+        Image _image = Image.memory(Uint8List.fromList(kTransparentImage));
+
+        if (menuItem == 'Assets') {
+          apiService
+              .getAssetImage((new JDERequestModel.withKey(
+                  token, employeeModel.employees[index].employeeID)))
+              .then((value) {
+            _image = value;
+          });
+
+          scaffoldKey.currentState?.showBottomSheet(
             (BuildContext context) {
               return Container(
                 height: 82,
-                color: Color.fromARGB(255, 191, 206, 183),
+                color: Color.fromARGB(255, 235, 242, 245),
                 child: Center(
                     child: Column(children: <Widget>[
-                  Text('Employee company Detail',
-                      style: TextStyle(
-                          fontSize: 15,
-                          color: Color.fromARGB(255, 93, 33, 243))),
+                  _image,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
@@ -249,12 +241,14 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
             },
           );
           //      print(MenuItem);
-        } else if (menuItem == 'Delete') {
-          runZoned(() {
-            _deleteConfirm(context, index);
-          }, onError: (dynamic e, StackTrace stack) {
-            Navigator.of(context).popUntil(ModalRoute.withName("/"));
-          });
+        } else if (menuItem == 'Modify') {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  settings: RouteSettings(name: "/EMPPage"),
+                  builder: (context) {
+                    return EditEmpPage.withIndex(token, index);
+                  }));
         }
       },
     );
@@ -270,35 +264,34 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
             actions: [
               TextButton(
                   onPressed: () {
-                    setState(() {
-                      try {
-                        apiService = new APIService();
-                        apiService
-                            .deleteEmployee(new JDERequestModel.withKey(
-                                token, empKey[listIndex]))
-                            .then((value) {
-                          setState(() {
-                            _loadEmployeeData();
-                          });
-                          if (value) {
-                            final snackBar =
-                                SnackBar(content: Text("Delete Success"));
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                          }
-                        });
-                      } on Exception catch (e) {
-                        Navigator.of(context)
-                            .popUntil(ModalRoute.withName("/"));
-                      }
-                    });
+                    try {
+                      apiService
+                          .deleteEmployee(new JDERequestModel.withKey(token,
+                              employeeModel.employees[listIndex].employeeID))
+                          .then((value) {
+                        if (value) {
+                          employeeModel.deleteEmployee(listIndex);
+                          final snackBar = SnackBar(
+                            content: Text("Delete Success"),
+                            behavior: SnackBarBehavior.floating,
+                            margin: EdgeInsets.only(
+                                top: 100), // Adjust the top margin as needed
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          //    Future.delayed(Duration(seconds: 5));
+                          //    _loadEmployeeData();
+                        }
+                      });
+                    } on Exception {
+                      Navigator.of(context).popUntil(ModalRoute.withName("/"));
+                    }
 
-                    Navigator.of(context).pop();
+                    Navigator.of(ctx).pop();
                   },
                   child: const Text('Yes')),
               TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(ctx).pop();
                   },
                   child: const Text('No'))
             ],

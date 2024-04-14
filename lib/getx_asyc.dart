@@ -16,7 +16,7 @@ class MyController extends GetxController {
 
   void loadData() async {
     // Simulate a delay for loading data
-    await Future.delayed(Duration(seconds: 50));
+    //  await Future.delayed(Duration(seconds: 50));
     message.value = "Data loaded successfully!";
     update();
   }

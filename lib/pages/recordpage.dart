@@ -6,8 +6,8 @@ void main() {
 }
 
 class Record {
-  String name;
-  String details;
+  String? name;
+  String? details;
 
   Record({this.name, this.details});
 }
@@ -52,8 +52,8 @@ class RecordListPage extends StatelessWidget {
         itemCount: recordProvider.records.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(recordProvider.records[index].name),
-            subtitle: Text(recordProvider.records[index].details),
+            title: Text(recordProvider.records[index].name!),
+            subtitle: Text(recordProvider.records[index].details!),
             onTap: () {
               // Navigate to the detail page when a record is tapped
               Navigator.push(
@@ -74,14 +74,14 @@ class RecordListPage extends StatelessWidget {
 }
 
 class RecordDetailPage extends StatelessWidget {
-  final int index;
+  final int? index;
 
   RecordDetailPage({this.index});
 
   @override
   Widget build(BuildContext context) {
     var recordProvider = Provider.of<RecordProvider>(context);
-    var record = recordProvider.records[index];
+    var record = recordProvider.records[index!];
 
     return Scaffold(
       appBar: AppBar(
@@ -100,7 +100,7 @@ class RecordDetailPage extends StatelessWidget {
               decoration: InputDecoration(labelText: "New Details"),
               onChanged: (value) {
                 // Update details in the provider when text field changes
-                recordProvider.updateDetails(index, value);
+                recordProvider.updateDetails(index!, value);
               },
             ),
           ],
