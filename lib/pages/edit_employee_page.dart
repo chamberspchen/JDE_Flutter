@@ -13,17 +13,17 @@ import 'package:get/get.dart';
 class EditEmpPage extends StatelessWidget {
   String token;
   int index = 0;
-  JDERequestModel? requestMD;
+  late JDERequestModel requestMD;
   String? dropdownValue;
   EmployeeModel? employeeModel;
   Employee employee = new Employee.initValues();
-  String mode = "update";
+  String mode = "";
 
   APIService apiService = new APIService();
   static GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
 
-  EditEmpPage(this.token);
-  EditEmpPage.withIndex(this.token, this.index);
+  EditEmpPage(this.token, this.mode);
+  EditEmpPage.withIndex(this.token, this.index, this.mode);
 
   bool validateAndSave() {
     if (globalFormKey.currentState != null &&
@@ -34,16 +34,17 @@ class EditEmpPage extends StatelessWidget {
     return false;
   }
 
+  void initState() {}
+
   @override
   Widget build(BuildContext context) {
     requestMD = new JDERequestModel(token);
-    try {
-      employeeModel = Provider.of<EmployeeModel>(context, listen: false);
-      dropdownValue = employeeModel?.employees[index].companyID;
-    } on Exception {
-      employeeModel = new EmployeeModel();
+    employeeModel = Provider.of<EmployeeModel>(context, listen: false);
+
+    if (mode == "create") {
       dropdownValue = 'c1';
-      mode = "create";
+    } else if (mode == 'modify') {
+      dropdownValue = employeeModel?.employees[index].companyID;
     }
 
     //Controler initial
@@ -84,7 +85,7 @@ class EditEmpPage extends StatelessWidget {
                             12)), // Set border radius if you want rounded corners
                       ),
                       child: TextFormField(
-                          initialValue: employeeModel!.employees.length != 0
+                          initialValue: mode == "modify"
                               ? employeeModel!.employees[index].employeeName
                               : '',
                           onSaved: (input) {
@@ -118,7 +119,7 @@ class EditEmpPage extends StatelessWidget {
                                 12)), // Set border radius if you want rounded corners
                           ),
                           child: TextFormField(
-                            initialValue: employeeModel!.employees.length != 0
+                            initialValue: mode == "modify"
                                 ? employeeModel!.employees[index].jobDesc
                                 : '',
                             onSaved: (input) {
@@ -153,10 +154,8 @@ class EditEmpPage extends StatelessWidget {
                                 12)), // Set border radius if you want rounded corners
                           ),
                           child: TextFormField(
-                            enabled: employeeModel!.employees.length != 0
-                                ? false
-                                : true,
-                            initialValue: employeeModel!.employees.length != 0
+                            enabled: mode == "modify" ? false : true,
+                            initialValue: mode == "modify"
                                 ? employeeModel!.employees[index].employeeID
                                 : '',
                             onSaved: (input) {
@@ -249,7 +248,7 @@ class EditEmpPage extends StatelessWidget {
                   child: ElevatedButton(
                 onPressed: () {
                   if (validateAndSave()) {
-                    if (mode == "update")
+                    if (mode == "modify")
                       _updateEmployee(context);
                     else if (mode == "create") _addEmployee(context);
                   }
@@ -314,7 +313,10 @@ class UDCController extends GetxController {
       });
       // ignore: deprecated_member_use
     }, onError: (dynamic e, StackTrace stack) {
-      Navigator.of(context).popUntil(ModalRoute.withName("/"));
+      Future.delayed(Duration.zero, () {
+        Get.back();
+      });
+      //  Navigator.of(context).popUntil((route) => route.isFirst);
     });
   }
 }

@@ -1,10 +1,12 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_http_post_request/pages/edit_employee_page.dart';
+import 'package:flutter_http_post_request/pages/showAsset.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:transparent_image/transparent_image.dart';
+
 import '../model/JDE_model.dart';
 import '../api/api_service.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -58,33 +60,86 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
         child: MaterialApp(
             debugShowCheckedModeBanner: false,
             home: new Scaffold(
+              drawer: Drawer(
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 38.0),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  "assets/images/logo.png",
+                                  width: 80,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              "EnterpriseOne",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            )
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Builder(builder: (context) {
+                          return ListView(
+                            children: <Widget>[
+                              ListTile(
+                                leading: const Icon(Icons.add),
+                                title: const Text('Add Employee'),
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          settings:
+                                              RouteSettings(name: "/EMPPage"),
+                                          builder: (context) {
+                                            return EditEmpPage(token, "create");
+                                          }));
+                                  scaffoldKey.currentState!.closeDrawer();
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.exit_to_app),
+                                title: const Text('Exit'),
+                                onTap: () {
+                                  Get.back();
+                                },
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               backgroundColor: const Color.fromARGB(255, 103, 158, 254),
               key: scaffoldKey,
               // backgroundColor: Theme.of(context).colorScheme.background,
               appBar: new AppBar(
-                  title: new Text('Employee Master List'),
-                  leading: GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context); // 返回操作
+                title: new Text('Employee Master List'),
+                leading: Builder(builder: (context) {
+                  return IconButton(
+                    icon: Icon(Icons.dashboard),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
                     },
-                    child: Icon(Icons.arrow_back),
-                  )),
+                  );
+                }),
+              ),
               body: new Center(
                   child: employeeModel.employees.length == 0
                       ? new CircularProgressIndicator()
                       : showMyUI(context)),
-              floatingActionButton: FloatingActionButton(
-                child: Icon(Icons.add),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          settings: RouteSettings(name: "/EMPPage"),
-                          builder: (context) {
-                            return EditEmpPage(token);
-                          }));
-                },
-              ),
             )));
   }
 
@@ -98,98 +153,101 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
       });
     }
 
-    return ListView.builder(
-        itemCount: employeeModel.employees.length,
-        itemBuilder: (_, index) {
-          return new Container(
-            margin: new EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
-            child: Slidable(
-              key: const ValueKey(0),
-              endActionPane: ActionPane(
-                motion: ScrollMotion(),
-                children: [
-                  SlidableAction(
-                    flex: 2,
-                    onPressed: (_) {
-                      runZoned(() {
-                        _deleteConfirm(context, index);
-                        // ignore: deprecated_member_use
-                      }, onError: (dynamic e, StackTrace stack) {
-                        Navigator.of(context)
-                            .popUntil(ModalRoute.withName("/"));
-                      });
-                    },
-                    backgroundColor: Color(0xFF7BC043),
-                    foregroundColor: Color.fromARGB(255, 227, 21, 21),
-                    icon: Icons.edit,
-                    label: 'Delete',
-                  ),
-                ],
-              ),
-              child: new Card(
-                elevation: 10.0,
-                child: new Container(
-                  padding: new EdgeInsets.all(12.0),
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Padding(
-                          padding: new EdgeInsets.symmetric(vertical: 3.0)),
-                      ExpansionTile(
-                        title: Builder(builder: (context) {
-                          employee = Provider.of<EmployeeModel>(context);
-                          return RichText(
-                              text: TextSpan(children: <TextSpan>[
-                            TextSpan(
-                                text:
-                                    '${employee.employees[index].employeeName}',
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.blue)),
-                          ])
-
-                              //${employeeList[index].employeeName}
-                              );
-                        }),
-                        //     subtitle: const Text('Custom expansion arrow icon'),
-                        trailing: Icon(
-                          _customTileExpanded
-                              ? Icons.arrow_drop_down_circle
-                              : Icons.arrow_drop_down,
-                        ),
-                        children: <Widget>[
-                          Builder(builder: (context) {
+    return Builder(builder: (context) {
+      employee = Provider.of<EmployeeModel>(context);
+      return ListView.builder(
+          itemCount: employee.employees.length,
+          itemBuilder: (_, index) {
+            return new Container(
+              margin: new EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
+              child: Slidable(
+                key: const ValueKey(0),
+                endActionPane: ActionPane(
+                  motion: ScrollMotion(),
+                  children: [
+                    SlidableAction(
+                      flex: 2,
+                      onPressed: (_) {
+                        runZoned(() {
+                          _deleteConfirm(context, index);
+                          // ignore: deprecated_member_use
+                        }, onError: (dynamic e, StackTrace stack) {
+                          Navigator.of(context)
+                              .popUntil(ModalRoute.withName("/"));
+                        });
+                      },
+                      backgroundColor: Color(0xFF7BC043),
+                      foregroundColor: Color.fromARGB(255, 227, 21, 21),
+                      icon: Icons.edit,
+                      label: 'Delete',
+                    ),
+                  ],
+                ),
+                child: new Card(
+                  elevation: 10.0,
+                  child: new Container(
+                    padding: new EdgeInsets.all(12.0),
+                    child: new Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        new Padding(
+                            padding: new EdgeInsets.symmetric(vertical: 3.0)),
+                        ExpansionTile(
+                          title: Builder(builder: (context) {
                             employee = Provider.of<EmployeeModel>(context);
-                            return ListTile(
-                              tileColor: Color.fromARGB(255, 242, 242, 231),
-                              title: Text(
-                                'Job:    ${employee.employees[index].jobDesc}',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Color.fromARGB(255, 93, 33, 243)),
-                              ),
-                              //    trailing: Icon(Icons.more_vert)
-                              trailing: _menu(
-                                  context,
-                                  employeeModel.employees[index].employeeID ??
-                                      '',
-                                  index),
-                              onTap: () {},
-                            );
+                            return RichText(
+                                text: TextSpan(children: <TextSpan>[
+                              TextSpan(
+                                  text:
+                                      '${employee.employees[index].employeeName}',
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.blue)),
+                            ])
+
+                                //${employeeList[index].employeeName}
+                                );
                           }),
-                        ],
-                        onExpansionChanged: (bool expanded) {
-                          setState(() {
-                            _customTileExpanded = expanded;
-                          });
-                        },
-                      )
-                    ],
+                          //     subtitle: const Text('Custom expansion arrow icon'),
+                          trailing: Icon(
+                            _customTileExpanded
+                                ? Icons.arrow_drop_down_circle
+                                : Icons.arrow_drop_down,
+                          ),
+                          children: <Widget>[
+                            Builder(builder: (context) {
+                              employee = Provider.of<EmployeeModel>(context);
+                              return ListTile(
+                                tileColor: Color.fromARGB(255, 242, 242, 231),
+                                title: Text(
+                                  'Job:    ${employee.employees[index].jobDesc}',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: Color.fromARGB(255, 93, 33, 243)),
+                                ),
+                                //    trailing: Icon(Icons.more_vert)
+                                trailing: _menu(
+                                    context,
+                                    employeeModel.employees[index].employeeID ??
+                                        '',
+                                    index),
+                                onTap: () {},
+                              );
+                            }),
+                          ],
+                          onExpansionChanged: (bool expanded) {
+                            setState(() {
+                              _customTileExpanded = expanded;
+                            });
+                          },
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        });
+            );
+          });
+    });
   }
 
   Widget _menu(BuildContext context, String empID, int index) {
@@ -207,36 +265,22 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
         )
       ],
       onSelected: (String menuItem) {
-        Image _image = Image.memory(Uint8List.fromList(kTransparentImage));
-
         if (menuItem == 'Assets') {
-          apiService
+/*          apiService
               .getAssetImage((new JDERequestModel.withKey(
                   token, employeeModel.employees[index].employeeID)))
               .then((value) {
             _image = value;
           });
-
+*/
           scaffoldKey.currentState?.showBottomSheet(
             (BuildContext context) {
               return Container(
-                height: 82,
+                height: 200,
                 color: Color.fromARGB(255, 235, 242, 245),
                 child: Center(
-                    child: Column(children: <Widget>[
-                  _image,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      // ElevatedButton(
-                      //   child: const Text('Yes'),
-                      //   onPressed: () {
-                      //     Navigator.pop(context);
-                      //   },
-                    ],
-                  ),
-                ])),
+                    child: new ShowAssetWidget(new JDERequestModel.withKey(
+                        token, employeeModel.employees[index].employeeID))),
               );
             },
           );
@@ -247,7 +291,7 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
               MaterialPageRoute(
                   settings: RouteSettings(name: "/EMPPage"),
                   builder: (context) {
-                    return EditEmpPage.withIndex(token, index);
+                    return EditEmpPage.withIndex(token, index, "modify");
                   }));
         }
       },
@@ -270,16 +314,15 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
                               employeeModel.employees[listIndex].employeeID))
                           .then((value) {
                         if (value) {
-                          employeeModel.deleteEmployee(listIndex);
                           final snackBar = SnackBar(
                             content: Text("Delete Success"),
                             behavior: SnackBarBehavior.floating,
+                            duration: Duration(seconds: 5),
                             margin: EdgeInsets.only(
                                 top: 100), // Adjust the top margin as needed
                           );
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          //    Future.delayed(Duration(seconds: 5));
-                          //    _loadEmployeeData();
+                          employeeModel.deleteEmployee(listIndex);
                         }
                       });
                     } on Exception {

@@ -34,8 +34,8 @@ class JDERequestModel {
     } else if (request == 'asset') {
       body = jsonEncode({
         'token': token.trim(),
-        "assetID": "at1",
-        "eeID": "ep2",
+        //   "assetID": "at2",
+        "eeID": key?.trim(),
         "SeqID": "1",
       });
     } else if (request == 'company') {
@@ -169,13 +169,17 @@ class EmployeeModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void createEmployee(String jodDesc, String employeeName, String companyID,
-      String employeeID) {
+  void createEmployee(
+    String employeeID,
+    String jodDesc,
+    String employeeName,
+    String companyID,
+  ) {
     Employee employee = new Employee.initValues();
-    employee.employeeID = companyID;
+    employee.employeeID = employeeID;
     employee.jobDesc = jodDesc;
     employee.employeeName = employeeName;
-    employee..companyID = companyID;
+    employee.companyID = companyID;
 
     _employees.add(employee);
 

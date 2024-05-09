@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'pages/login_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
+      initialRoute: "/",
       title: 'Image Loader',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -37,7 +39,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: LoginPage(),
+      getPages: [
+        GetPage(name: '/', page: () => LoginPage()),
+      ],
     );
   }
 }

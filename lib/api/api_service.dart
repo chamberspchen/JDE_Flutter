@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../model/JDE_model.dart';
@@ -121,33 +120,6 @@ class APIService {
           : false;
     } else {
       throw Exception('Failed to update data!');
-    }
-  }
-
-  /**Retrieve Image */
-  Future<Image> getAssetImage(JDERequestModel requestModel) async {
-    final uri = Uri.parse(
-        'http://192.168.12.128:8305/jderest/orchestrator/GetImageFile');
-
-    http.Response? response;
-    try {
-      response = await http.post(uri,
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Accept': 'application/octet-stream'
-          },
-          body: requestModel.toJson('asset'));
-    } on FormatException catch (e) {
-      print(e);
-    }
-    if (response!.statusCode == 200 || response.statusCode == 400) {
-      // final decodedData = json.decode(response.body);
-
-      // var file = File('C:\\Share\\laptop.jpg');
-      // await file.writeAsBytes();
-      return Image.memory(response.bodyBytes);
-    } else {
-      throw Exception('Failed to load data!');
     }
   }
 
