@@ -270,12 +270,23 @@ class EditEmpPage extends StatelessWidget {
         if (value) {
           employeeModel!.updateEmployee(
               index, employee.jobDesc!, employee.employeeName!, dropdownValue!);
+          final snackBar = SnackBar(
+            content: Text("Update Success"),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 5),
+            margin:
+                EdgeInsets.only(top: 100), // Adjust the top margin as needed
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
           Navigator.of(context).pop(ModalRoute.withName("/ShowEMPPage"));
         }
       });
       // ignore: deprecated_member_use
     }, onError: (dynamic e, StackTrace stack) {
-      //  return false;
+      Future.delayed(Duration.zero, () {
+        Get.back();
+      });
     });
   }
 
@@ -287,11 +298,23 @@ class EditEmpPage extends StatelessWidget {
         if (value) {
           employeeModel!.createEmployee(employee.employeeID!, employee.jobDesc!,
               employee.employeeName!, dropdownValue!);
+          final snackBar = SnackBar(
+            content: Text("Create Success"),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 5),
+            margin:
+                EdgeInsets.only(top: 100), // Adjust the top margin as needed
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
           Navigator.of(context).pop(ModalRoute.withName("/ShowEMPPage"));
         }
       });
       // ignore: deprecated_member_use
-    }, onError: (dynamic e, StackTrace stack) {});
+    }, onError: (dynamic e, StackTrace stack) {
+      Future.delayed(Duration.zero, () {
+        Get.back();
+      });
+    });
   }
 }
 
@@ -299,12 +322,12 @@ class UDCController extends GetxController {
   var companyName = ''.obs;
 
   APIService apiService = new APIService();
-  late JDERequestModel requestMD;
+  JDERequestModel requestMD = new JDERequestModel('');
   List<Company> companyList = [];
 
   loadCompanyName(String key, BuildContext context, String token) {
     runZoned(() {
-      requestMD = new JDERequestModel(token);
+      requestMD.setToken = token;
       requestMD.setKey = key;
       apiService.getCompany(requestMD).then((value) {
         this.companyList = value.getCompanyData();

@@ -20,6 +20,10 @@ class JDERequestModel {
     this.key = str;
   }
 
+  set setToken(String str) {
+    this.token = str;
+  }
+
   set setEmployee(Employee employee) {
     this.employee = employee;
   }
