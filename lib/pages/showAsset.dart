@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_http_post_request/api/api_image.dart';
 import 'package:flutter_http_post_request/model/JDE_model.dart';
@@ -10,13 +12,15 @@ class ShowAssetWidget extends StatelessWidget {
   ShowAssetWidget(this._requestModel);
 
   Widget _buildView() {
-    // Consumer 提供监听功能的小部件
     return Consumer(builder: (
       BuildContext context,
       WidgetRef ref,
       Widget? widget,
     ) {
       ref.read(assetImageProvider.notifier).loadImage(_requestModel!);
+      // ignore: deprecated_member_use
+      ;
+
       return Column(children: <Widget>[
         BottomImage(),
         Row(

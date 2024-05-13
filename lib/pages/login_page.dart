@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_http_post_request/api/api_service.dart';
 import 'package:flutter_http_post_request/model/login_model.dart';
 import 'package:flutter_http_post_request/pages/employee_page.dart';
-import 'package:get/get.dart';
 
 import '../ProgressHUD.dart';
 

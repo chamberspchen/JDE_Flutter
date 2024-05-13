@@ -41,8 +41,9 @@ class AssetImage extends _$AssetImage {
       _image = Image.memory(response.bodyBytes);
       ref.invalidateSelf();
     } else {
+      _image = Image.memory(Uint8List.fromList(kTransparentImage));
       ref.invalidateSelf();
-      throw Exception('Failed to load data!');
+      //throw Exception('Failed to load data!');
     }
   }
 }

@@ -49,9 +49,9 @@ class EditEmpPage extends StatelessWidget {
 
     //Controler initial
 
-    UDCController udcController = Get.put(UDCController(requestMD!));
+    UDCController udcController = Get.put(UDCController());
     DrawMenuController drawMenuController = Get.put(DrawMenuController());
-    udcController.loadCompanyName(dropdownValue!, context);
+    udcController.loadCompanyName(dropdownValue!, context, token);
 
     return new MaterialApp(
         home: new Scaffold(
@@ -211,7 +211,8 @@ class EditEmpPage extends StatelessWidget {
                             elevation: 16,
                             onChanged: (String? value) {
                               drawMenuController.refreshDropdown(value!);
-                              udcController.loadCompanyName(value, context);
+                              udcController.loadCompanyName(
+                                  value, context, token);
                               employee.companyID = value;
                               dropdownValue = value;
                             },
@@ -264,8 +265,8 @@ class EditEmpPage extends StatelessWidget {
   _updateEmployee(BuildContext context) {
     runZoned(() {
       if (employee.companyID == null) employee.companyID = dropdownValue;
-      requestMD!.setEmployee = employee;
-      apiService.updateEmployee(requestMD!).then((value) {
+      requestMD.setEmployee = employee;
+      apiService.updateEmployee(requestMD).then((value) {
         if (value) {
           employeeModel!.updateEmployee(
               index, employee.jobDesc!, employee.employeeName!, dropdownValue!);
@@ -281,8 +282,8 @@ class EditEmpPage extends StatelessWidget {
   _addEmployee(BuildContext context) {
     runZoned(() {
       if (employee.companyID == null) employee.companyID = dropdownValue;
-      requestMD!.setEmployee = employee;
-      apiService.createEmployee(requestMD!).then((value) {
+      requestMD.setEmployee = employee;
+      apiService.createEmployee(requestMD).then((value) {
         if (value) {
           employeeModel!.createEmployee(employee.employeeID!, employee.jobDesc!,
               employee.employeeName!, dropdownValue!);
@@ -298,13 +299,12 @@ class UDCController extends GetxController {
   var companyName = ''.obs;
 
   APIService apiService = new APIService();
-  JDERequestModel requestMD;
+  late JDERequestModel requestMD;
   List<Company> companyList = [];
 
-  UDCController(this.requestMD);
-
-  loadCompanyName(String key, BuildContext context) {
+  loadCompanyName(String key, BuildContext context, String token) {
     runZoned(() {
+      requestMD = new JDERequestModel(token);
       requestMD.setKey = key;
       apiService.getCompany(requestMD).then((value) {
         this.companyList = value.getCompanyData();
