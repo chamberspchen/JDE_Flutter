@@ -276,7 +276,7 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
           scaffoldKey.currentState?.showBottomSheet(
             (BuildContext context) {
               return Container(
-                height: 200,
+                height: 280,
                 color: Color.fromARGB(255, 235, 242, 245),
                 child: Center(
                     child: new ShowAssetWidget(new JDERequestModel.withKey(

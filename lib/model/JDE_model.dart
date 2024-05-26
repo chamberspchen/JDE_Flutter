@@ -39,8 +39,8 @@ class JDERequestModel {
       body = jsonEncode({
         'token': token.trim(),
         //   "assetID": "at2",
-        "eeID": key?.trim(),
-        "SeqID": "1",
+        "employeeID": key?.trim(),
+        // "SeqID": "1",
       });
     } else if (request == 'company') {
       body = jsonEncode({
@@ -102,6 +102,31 @@ class CompanyResponseModel {
   }
 }
 
+class ImageResponseModel {
+  List<ImageValue> imagelist = [];
+  ImageResponseModel({required this.imagelist});
+
+  factory ImageResponseModel.fromJson(Map<String, dynamic> json) {
+    List<ImageValue> imglist = [];
+    List jsonlist = json["AssetArray"];
+    for (int i = 0; i < jsonlist.length; i++) {
+      imglist.add(new ImageValue(
+        jsonlist[i]["AssetID"],
+        jsonlist[i]["AssetName"],
+        jsonlist[i]["Amount"],
+      ));
+    }
+
+    return ImageResponseModel(
+      imagelist: imglist,
+    );
+  }
+
+  getImageData() {
+    return imagelist;
+  }
+}
+
 class EmployeeResponseModel {
   List<Employee> employeelist = [];
   String? employeeName;
@@ -149,6 +174,16 @@ class Employee {
   Employee(this.companyID, this.employeeID, this.jobDesc, this.employeeName);
   Employee.initValues();
 }
+
+class ImageValue {
+  String? assetID;
+  String? assetName;
+  int? amount;
+  Image? image;
+
+  ImageValue(this.assetID, this.assetName, this.amount);
+}
+
 /********************* */
 
 /**Provider*/

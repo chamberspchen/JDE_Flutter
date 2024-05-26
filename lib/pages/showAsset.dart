@@ -22,7 +22,7 @@ class ShowAssetWidget extends StatelessWidget {
       return Column(children: <Widget>[
         BottomImage(),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             ElevatedButton(
