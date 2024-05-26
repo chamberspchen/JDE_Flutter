@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
+//import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:transparent_image/transparent_image.dart';
+//import 'package:transparent_image/transparent_image.dart';
 import '../model/JDE_model.dart';
 
 part 'api_image.g.dart';
