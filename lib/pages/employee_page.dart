@@ -55,6 +55,7 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
 
   @override
   Widget build(BuildContext context) {
+    /***Provider */
     return ChangeNotifierProvider<EmployeeModel>(
         create: (_) => employeeModel,
         child: MaterialApp(
@@ -266,13 +267,6 @@ class _ShowEmpPageState extends State<ShowEmpPage> {
       ],
       onSelected: (String menuItem) {
         if (menuItem == 'Assets') {
-/*          apiService
-              .getAssetImage((new JDERequestModel.withKey(
-                  token, employeeModel.employees[index].employeeID)))
-              .then((value) {
-            _image = value;
-          });
-*/
           scaffoldKey.currentState?.showBottomSheet(
             (BuildContext context) {
               return Container(

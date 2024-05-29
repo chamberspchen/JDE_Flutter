@@ -74,6 +74,28 @@ class APIService {
     }
   }
 
+/**GetNextNumber*/
+  Future<int> getNN(JDERequestModel requestModel) async {
+    final uri = Uri.parse(
+        'http://192.168.12.128:8305/jderest/orchestrator/GetNextNumber');
+
+    http.Response? response;
+    try {
+      response = await http.post(uri,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: requestModel.toJson('newKey'));
+    } on FormatException catch (e) {
+      print(e);
+    }
+    if (response!.statusCode == 200 || response.statusCode == 400) {
+      return json.decode(response.body)["mnUniqueKeyID"];
+    } else {
+      throw Exception('Failed to load data!');
+    }
+  }
+
 /**Delete Employee*/
   Future<bool> deleteEmployee(JDERequestModel requestModel) async {
     final uri = Uri.parse(
@@ -134,7 +156,7 @@ class APIService {
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
-          body: requestModel.toJson('Create'));
+          body: requestModel.toJson('create'));
     } on FormatException catch (e) {
       print(e);
       return false;

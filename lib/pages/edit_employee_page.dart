@@ -6,8 +6,7 @@ import 'package:provider/provider.dart';
 import '../api/api_service.dart';
 import '../model/JDE_model.dart';
 import 'package:get/get.dart';
-
-//bool isApiCallProcess = false;
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 // ignore: must_be_immutable
 class EditEmpPage extends StatelessWidget {
@@ -54,212 +53,228 @@ class EditEmpPage extends StatelessWidget {
     udcController.loadCompanyName(dropdownValue!, context, token);
 
     return new MaterialApp(
-        home: new Scaffold(
-      backgroundColor: Color.fromARGB(255, 154, 190, 253),
-      appBar: new AppBar(
-          title: new Text('Employee Detail Input'),
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context); // 返回操作
-            },
-            child: Icon(Icons.arrow_back),
-          )),
-      body: Form(
-          key: globalFormKey,
-          child: SingleChildScrollView(
-              child: Column(
-            children: <Widget>[
-              ListTile(
-                  //  tileColor: Color.fromARGB(255, 221, 237, 245),
-                  title: Text(
-                    'Employee Name',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                        color: Color.fromARGB(255, 2, 61, 108)),
-                  ),
-                  subtitle: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(
-                            12)), // Set border radius if you want rounded corners
+        home: BlocProvider(
+            //       create: (_) => NextNumber(),
+            create: (context) => NextNumber('')..getNextNnumber(token),
+            child: Scaffold(
+              backgroundColor: Color.fromARGB(255, 154, 190, 253),
+              appBar: new AppBar(
+                  title: new Text('Employee Detail Input'),
+                  leading: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context); // 返回操作
+                    },
+                    child: Icon(Icons.arrow_back),
+                  )),
+              body: Form(
+                  key: globalFormKey,
+                  child: SingleChildScrollView(
+                      child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title: Text(
+                                'ID Number',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                    color: Color.fromARGB(255, 2, 61, 108)),
+                              ),
+                              subtitle: BlocBuilder<NextNumber, String>(
+                                  builder: (context, NN) {
+                                employee.employeeID = mode == "modify"
+                                    ? employeeModel!.employees[index].employeeID
+                                    : NN;
+                                return Text(
+                                  '${employee.employeeID}',
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19,
+                                      color: Color.fromARGB(255, 21, 176, 132)),
+                                );
+                              }),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Expanded(
+                            child: Text(''),
+                          ),
+                        ],
                       ),
-                      child: TextFormField(
-                          initialValue: mode == "modify"
-                              ? employeeModel!.employees[index].employeeName
-                              : '',
-                          onSaved: (input) {
-                            employee.employeeName = input;
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Full Name",
-                            border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12))),
-                          )))),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: ListTile(
-                        //      tileColor: Color.fromARGB(255, 221, 237, 245),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ListTile(
+                          //  tileColor: Color.fromARGB(255, 221, 237, 245),
+                          title: Text(
+                            'Employee Name',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: Color.fromARGB(255, 2, 61, 108)),
+                          ),
+                          subtitle: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(Radius.circular(
+                                    12)), // Set border radius if you want rounded corners
+                              ),
+                              child: TextFormField(
+                                  initialValue: mode == "modify"
+                                      ? employeeModel!
+                                          .employees[index].employeeName
+                                      : '',
+                                  onSaved: (input) {
+                                    employee.employeeName = input;
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: "Full Name",
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12))),
+                                  )))),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                                //      tileColor: Color.fromARGB(255, 221, 237, 245),
+                                title: Text(
+                                  'Jot Title',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22,
+                                      color: Color.fromARGB(255, 2, 61, 108)),
+                                ),
+                                subtitle: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(Radius.circular(
+                                        12)), // Set border radius if you want rounded corners
+                                  ),
+                                  child: TextFormField(
+                                    initialValue: mode == "modify"
+                                        ? employeeModel!
+                                            .employees[index].jobDesc
+                                        : '',
+                                    onSaved: (input) {
+                                      employee.jobDesc = input;
+                                    },
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(12))),
+                                      hintText: ' Job',
+                                    ),
+                                  ),
+                                )),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Expanded(
+                            child: Text(''),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      ListTile(
                         title: Text(
-                          'Jot Title',
+                          'Company',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 22,
                               color: Color.fromARGB(255, 2, 61, 108)),
                         ),
-                        subtitle: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(
-                                12)), // Set border radius if you want rounded corners
-                          ),
-                          child: TextFormField(
-                            initialValue: mode == "modify"
-                                ? employeeModel!.employees[index].jobDesc
-                                : '',
-                            onSaved: (input) {
-                              employee.jobDesc = input;
-                            },
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12))),
-                              hintText: ' Job',
-                            ),
-                          ),
-                        )),
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Expanded(
-                    child: ListTile(
-                        //     tileColor: Color.fromARGB(255, 221, 237, 245),
-                        title: Text(
-                          'ID Number',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 22,
-                              color: Color.fromARGB(255, 2, 61, 108)),
-                        ),
-                        subtitle: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(
-                                12)), // Set border radius if you want rounded corners
-                          ),
-                          child: TextFormField(
-                            enabled: mode == "modify" ? false : true,
-                            initialValue: mode == "modify"
-                                ? employeeModel!.employees[index].employeeID
-                                : '',
-                            onSaved: (input) {
-                              employee.employeeID = input;
-                            },
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12))),
-                              hintText: '  ID',
-                            ),
-                          ),
-                        )),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              ListTile(
-                title: Text(
-                  'Company',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                      color: Color.fromARGB(255, 2, 61, 108)),
-                ),
-              ),
-              SizedBox(
-                height: 3,
-              ),
-              Row(
-                  //crossAxisAlignment,
-
-                  children: [
-                    SizedBox(width: 20),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 236, 249, 186),
-                        borderRadius: BorderRadius.all(Radius.circular(
-                            12)), // Set border radius if you want rounded corners
                       ),
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                          //crossAxisAlignment,
 
-                      padding: EdgeInsets.only(left: 20),
-                      //     alignment: Alignment.topLeft,
+                          children: [
+                            SizedBox(width: 20),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 236, 249, 186),
+                                borderRadius: BorderRadius.all(Radius.circular(
+                                    12)), // Set border radius if you want rounded corners
+                              ),
 
-                      //        crossAxisAlignment: CrossAxisAlignment.start,
-                      child: GetBuilder<DrawMenuController>(
-                        builder: (_) {
-                          return DropdownButton<String>(
-                            value: dropdownValue,
-                            icon: const Icon(Icons.arrow_drop_down_outlined),
-                            elevation: 16,
-                            onChanged: (String? value) {
-                              drawMenuController.refreshDropdown(value!);
-                              udcController.loadCompanyName(
-                                  value, context, token);
-                              employee.companyID = value;
-                              dropdownValue = value;
-                            },
-                            style: const TextStyle(
-                                color: Color.fromARGB(255, 42, 4, 119),
-                                fontSize: 20),
-                            items: drawMenuController.dropdownItems
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                  value: value, child: Text(value));
-                            }).toList(),
-                          );
+                              padding: EdgeInsets.only(left: 20),
+                              //     alignment: Alignment.topLeft,
+
+                              //        crossAxisAlignment: CrossAxisAlignment.start,
+                              child: GetBuilder<DrawMenuController>(
+                                builder: (_) {
+                                  return DropdownButton<String>(
+                                    value: dropdownValue,
+                                    icon: const Icon(
+                                        Icons.arrow_drop_down_outlined),
+                                    elevation: 16,
+                                    onChanged: (String? value) {
+                                      drawMenuController
+                                          .refreshDropdown(value!);
+                                      udcController.loadCompanyName(
+                                          value, context, token);
+                                      employee.companyID = value;
+                                      dropdownValue = value;
+                                    },
+                                    style: const TextStyle(
+                                        color: Color.fromARGB(255, 42, 4, 119),
+                                        fontSize: 20),
+                                    items: drawMenuController.dropdownItems
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                          value: value, child: Text(value));
+                                    }).toList(),
+                                  );
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 40,
+                            ),
+                            GetBuilder<UDCController>(builder: (_) {
+                              return Text(
+                                '${udcController.companyName.value}',
+                                style: TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 18,
+                                    color: Color.fromARGB(255, 2, 61, 108)),
+                                textAlign: TextAlign.left,
+                              );
+                            }),
+                          ]),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Container(
+                          child: ElevatedButton(
+                        onPressed: () {
+                          if (validateAndSave()) {
+                            if (mode == "modify")
+                              _updateEmployee(context);
+                            else if (mode == "create") _addEmployee(context);
+                          }
                         },
-                      ),
-                    ),
-                    SizedBox(
-                      width: 40,
-                    ),
-                    GetBuilder<UDCController>(builder: (_) {
-                      return Text(
-                        '${udcController.companyName.value}',
-                        style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 2, 61, 108)),
-                        textAlign: TextAlign.left,
-                      );
-                    }),
-                  ]),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                  child: ElevatedButton(
-                onPressed: () {
-                  if (validateAndSave()) {
-                    if (mode == "modify")
-                      _updateEmployee(context);
-                    else if (mode == "create") _addEmployee(context);
-                  }
-                },
-                child: Text('Confirm'),
-                //     style: flatButtonStyle,
-              ))
-            ],
-          ))),
-    ));
+                        child: Text('Confirm'),
+                        //     style: flatButtonStyle,
+                      ))
+                    ],
+                  ))),
+            )));
   }
 
   _updateEmployee(BuildContext context) {
@@ -318,6 +333,31 @@ class EditEmpPage extends StatelessWidget {
   }
 }
 
+/***Flutter BLOC**/
+class NextNumber extends Cubit<String> {
+  NextNumber(super.initialState);
+
+  APIService apiService = new APIService();
+  JDERequestModel requestMD = new JDERequestModel('');
+
+  getNextNnumber(String token) {
+    runZoned(() {
+      requestMD.setToken = token;
+      requestMD.setKey = 'FEMPLOYE';
+      apiService.getNN(requestMD).then((value) {
+        // state = value;
+        emit('ep' + value.toString());
+      });
+      // ignore: deprecated_member_use
+    }, onError: (dynamic e, StackTrace stack) {
+      Future.delayed(Duration.zero, () {
+        Get.back();
+      });
+    });
+  }
+}
+
+/***GETX **/
 class UDCController extends GetxController {
   var companyName = ''.obs;
 

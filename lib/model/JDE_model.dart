@@ -31,43 +31,71 @@ class JDERequestModel {
   toJson(String request) {
     var body;
 
-    if (request == 'employee') {
-      body = jsonEncode({
-        'token': token.trim(),
-      });
-    } else if (request == 'asset') {
-      body = jsonEncode({
-        'token': token.trim(),
-        //   "assetID": "at2",
-        "employeeID": key?.trim(),
-        // "SeqID": "1",
-      });
-    } else if (request == 'company') {
-      body = jsonEncode({
-        'token': token.trim(),
-        'companyID': key?.trim(),
-      });
-    } else if (request == 'delete') {
-      body = jsonEncode({
-        'token': token.trim(),
-        'empID': key?.trim(),
-      });
-    } else if (request == 'update') {
-      body = jsonEncode({
-        'token': token.trim(),
-        'EmpID': employee?.employeeID,
-        'EmpName': employee?.employeeName,
-        'JobTitle': employee?.jobDesc,
-        'ComID': employee?.companyID
-      });
-    } else if (request == 'Create') {
-      body = jsonEncode({
-        'token': token.trim(),
-        'EmployeeID': employee?.employeeID,
-        'EmployeeName': employee?.employeeName,
-        'JobTitle': employee?.jobDesc,
-        'CompanyID': employee?.companyID
-      });
+    //Query Data Key
+    switch (request) {
+      case 'employee':
+        {
+          body = jsonEncode({
+            'token': token.trim(),
+          });
+          break;
+        }
+      case 'asset':
+        {
+          body = jsonEncode({
+            'token': token.trim(),
+            "employeeID": key?.trim(),
+          });
+          break;
+        }
+      case 'newKey':
+        {
+          body = jsonEncode({
+            'token': token.trim(),
+            "table": key?.trim(),
+          });
+          break;
+        }
+      case 'company':
+        {
+          body = jsonEncode({
+            'token': token.trim(),
+            'companyID': key?.trim(),
+          });
+          break;
+        }
+
+      //Actions
+      case 'delete':
+        {
+          body = jsonEncode({
+            'token': token.trim(),
+            'empID': key?.trim(),
+          });
+          break;
+        }
+      case 'update':
+        {
+          body = jsonEncode({
+            'token': token.trim(),
+            'EmpID': employee?.employeeID,
+            'EmpName': employee?.employeeName,
+            'JobTitle': employee?.jobDesc,
+            'ComID': employee?.companyID
+          });
+          break;
+        }
+      case 'create':
+        {
+          body = jsonEncode({
+            'token': token.trim(),
+            'EmployeeID': employee?.employeeID,
+            'EmployeeName': employee?.employeeName,
+            'JobTitle': employee?.jobDesc,
+            'CompanyID': employee?.companyID
+          });
+          break;
+        }
     }
 
     return body;
