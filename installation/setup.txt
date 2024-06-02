@@ -1,0 +1,7 @@
+All required files have been included in Installation folder.
+
+1.  Restore the Par file: PRJ_BASE_DEVELOPE_001_60_99.par into the OMW, then get/genrate the tables included in the par file to the target environment.
+2.  Build and update package for this environment and deploy
+3.  Open the imp.exe from your oracle product to import the dump files in installation folder into your database
+    Note:Oracle Dump files can't be directly imported into SQL Server . SQL Server Migration Assistant (SSMA) can support the BLOB migration.
+4.  Import the JDE_Flutter-1717279033172.zip into Orchestration Studio.
